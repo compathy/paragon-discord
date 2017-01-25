@@ -4,7 +4,7 @@
   "description": "ParagonBot, but for Discord...",
   "main": "index.js",
   "scripts": {
-    "test": "mocha spec"
+    "test": "mocha index"
   },
   "repository": {
     "type": "git",
