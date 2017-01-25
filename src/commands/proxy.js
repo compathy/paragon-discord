@@ -1,5 +1,5 @@
-var api = require("../apiHandler");
-var proxyInfo = require("../../data/proxy.json");
+const api = require("../apiHandler"),
+    proxyInfo = require("../../data/proxy.json");
 
 var command = {};
 
