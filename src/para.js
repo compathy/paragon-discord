@@ -2,17 +2,23 @@ const Discord = require("discord.js"),
       log = require("fancy-log"),
       api = require("./apiHandler"),
       proxyInfo = require("../data/proxy.json")
-      commander = require("./commands/commander");
-const parasphere = new Discord.Client();
+      commander = require("./commands/commander"),
+      toobusy = require("toobusy-js"),
+      elm = require("event-loop-monitor"),
+      colors = require("colors");
+      parasphere = new Discord.Client();
+
+log.info('Paragon> Preparing bot...');
 
 parasphere.on('ready', () => {
-  log.info('Paragon> Preparing bot...');
   parasphere.started = new Date();
 
-  api.addProxy(proxyInfo.ip, proxyInfo.port);
+  elm.resume();
 
-  var finished = new Date();
-  log.info('Paragon> Started ${parasphere.user.username}! in ' + finished - parasphere.started + 'ms');
+  api.addProxy(proxyInfo.ip, proxyInfo.port);
+  log.info('Connected to ' + parasphere.guilds.size + ' guilds');
+
+  log.info('Paragon> Started Parasphere proxy');
 });
 
 let trigger = ">";
@@ -20,44 +26,33 @@ let trigger = ">";
 parasphere.on('message', msg => {
   if(!msg.content.startsWith(trigger)) return;
 
+  if(toobusy()) {
+    msg.channel.sendMessage("Manager> Under heavy traffic, unable to serve request. :/");
+    return;
+  }
+
   let cmdFormd = msg.content.split(" ");
   var inr = commander.commands.indexOf(cmdFormd[0].replace(/>/g, ''));
   if(inr == -1) {
     msg.channel.sendMessage(msg.author + " Command not found! Use >help for a list of commands.");
-    console.log(cmdFormd[0].replace(/>/g, ''));
     return;
   } else {
-    handleCommand(cmdFormd, msg.author, msg.channel);
+    commander.handleCommand(cmdFormd, msg.author, msg.channel);
+  }
+});
+
+elm.on('data', latency => {
+  if(latency.p50 >= 1350) {
+    log.warn("Latency gauge above limit -> ".yellow + latency.p50);
+  } else {
+    log.info("Latency -> ".magenta + latency.p50);
   }
 });
 
 api.token(function(err, res) {
     if(err) {
-      log.error('Could not get login token from API');
+      log.error('Could not get login token from API'.red);
       return;
     }
     parasphere.login(res);
 });
-
-//Commands:
-const proxyCommand = require("./commands/proxy");
-
-function handleCommand(cray, user, channel) {
-  let cmdToHandle = cray[0].replace(/>/g, '');
-
-  switch(cmdToHandle) {
-    case 'help':
-      commander.getHelp(function(res) {
-        channel.sendMessage(user + " " + res);
-      });
-      break;
-    case 'proxy':
-      proxyCommand.getProxy(function(res) {
-        channel.sendMessage(user + " " + res);
-      });
-    break;
-    default:
-      channel.sendMessage("Paragon> ?! Command error...")
-      break;
-  }
-}
