@@ -1,3 +1,8 @@
 {
-  "mashape": ""
+  "mashape": "",
+
+  "mongo": {
+    "host": "localhost",
+    "database": "parasphere"
+  }
 }
