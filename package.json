@@ -23,6 +23,7 @@
     "fancy-log": "^1.3.0",
     "mc-utils": "^1.0.6",
     "mocha": "^3.2.0",
+    "mongodb": "^2.2.22",
     "toobusy-js": "^0.5.1"
   }
 }
