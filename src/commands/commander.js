@@ -1,4 +1,5 @@
-const Discord = require("discord.js");
+const Discord = require("discord.js"),
+      dbApi = require("../database.js");
 
 var manager = {};
 
@@ -105,9 +106,11 @@ manager.handleCommand = function(cray, user, channel) {
       break;
     case 'invite':
       //TODO: And this...
-      var embedded = new Discord.RichEmbed().setDescription("**To invite, you must have management permissions - then just click the link below to select a server**").setColor("#90B5CA");
-      embedded.addField("Invite", "[Invitation Link](https://discordapp.com/api/oauth2/authorize?client_id=273591274899111937&scope=bot)", true).addField("Creator", "[phineas.io](https://phineas.io)").setFooter("**In NUMBER_OF//TODO: guilds...**");
+      dbApi.count({}, 'guilds', function(err, res) {
+        var embedded = new Discord.RichEmbed().setDescription("**To invite, you must have management permissions - then just click the link below to select a server**").setColor("#90B5CA");
+      embedded.addField("Invite", "[Invitation Link](https://discordapp.com/api/oauth2/authorize?client_id=273591274899111937&scope=bot)", true).addField("Creator", "[phineas.io](https://phineas.io)", true).setFooter("> In " + res + " guilds 🎇 phineas.io");
       channel.sendEmbed(embedded);
+      });
       break;
     default:
       channel.sendMessage("Paragon> ?! Command error...")

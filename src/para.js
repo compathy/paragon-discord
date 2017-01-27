@@ -60,34 +60,43 @@ parasphere.on('message', msg => {
 });
 
 parasphere.on('guildCreate', gc => {
-  var guildsn = {guildID: gc.id, guildName: gc.name, guildRegion: gc.region, owner: gc.owner.id, membersCount: gc.memberCount, addedAt: gc.joinedAt, inCord: true};
-  dbApi.insert(db.dbC, 'guilds', guildsn);
+  dbApi.get({guildID: gc.id}, 'guilds', function(err, res) {
+    if(!err) {
+      if(!res) {
+        var guildsn = {guildID: gc.id, guildName: gc.name, guildRegion: gc.region, owner: gc.owner.id, membersCount: gc.memberCount, addedAt: gc.joinedAt, inCord: true};
+        dbApi.insert(db.dbC, 'guilds', guildsn);
 
-  log.info("Guilds> Added to guild", gc.name);
+        log.info("Guilds> Added to guild", gc.name);
+      } else {
+        dbApi.update(dbApi.dbC, 'guilds', {guildID: gc.id}, {$set: {guildID: gc.id, guildName: gc.name, guildRegion: gc.region, owner: gc.owner.id, membersCount: gc.memberCount, addedBackAt: new Date(), inCord: true}});
+
+        log.info("Guilds> Added back to guild", gc.name);
+      }
+    }
+  });
 });
 
 parasphere.on('guildMemberAdd', gc => {
-  dbApi.update(db.dbC, 'guilds', {guildID: gc.id}, {$set: {membersCount: gc.memberCount}});
+  dbApi.update(dbApi.dbC, 'guilds', {guildID: gc.id}, {$set: {membersCount: gc.memberCount}});
 
   log.info("Guilds> A member was added to", gc.name);
 });
 
 parasphere.on('guildMemberRemove', gc => {
-  dbApi.update(db.dbC, 'guilds', {guildID: gc.id}, {$set: {membersCount: gc.memberCount}});
+  dbApi.update(dbApi.dbC, 'guilds', {guildID: gc.id}, {$set: {membersCount: gc.memberCount}});
 
   log.info("Guilds> A member was removed from", gc.name);
 });
 
-parasphere.on('guildUpdate', gc => {
+parasphere.on('guildUpdate', function(og, gc) {
   var updatesn = {$set: {guildID: gc.id, guildName: gc.name, guildRegion: gc.region, owner: gc.owner.id}};
-  log.info(updatesn);
-  var idObj = {_id: {guildID: gc.id}};
+  var idObj = {guildID: gc.id};
   dbApi.update(dbApi.dbC, 'guilds', idObj, updatesn);
 });
 
 parasphere.on('guildDelete', gc => {
-  var idObj = {_id: {guildID: gc.id}};
-  dbApi.update(db.dbC, 'guilds', idObj, {inCord: false});
+  var idObj = {guildID: gc.id};
+  dbApi.update(dbApi.dbC, 'guilds', idObj, {$set: {inCord: false}});
 
   log.info("Guilds> The", gc.name, "Guild was deleted or Paragon was ejected! ):")
 });
