@@ -1,20 +1,21 @@
 const mongo = require("mongodb"),
   MongoClient = mongo.MongoClient,
   data = require("../data/keys.json"),
-  mobject = require("mongodb").ObjectID,
+  mobject = require("mongodb").ObjectID;
   log = require("fancy-log");
 
 var api = {};
 var url = "mongodb://" + data.mongo.host + ":27017/" + data.mongo.database;
 
 
-api.dbConnect = function() {
+api.dbConnect = function(callback) {
   MongoClient.connect(url, function(err, db) {
     if (err) {
       log.error('Manager> Unable to connect to the mongoDB server. Error:', err);
     } else {
       log.info('Manager> Connection established to', url);
 
+      callback(db);
       api.dbC = db;
     }
   });
@@ -45,6 +46,19 @@ api.get = function(query, collection, callback) {
   var collection = db.collection(collection);
 
   collection.findOne(query, function(err, res) {
+    if(!err) {
+      callback(null, res);
+    } else {
+      callback(err, null);
+    }
+  });
+}
+
+api.count = function(cObject, collection, callback) {
+  db = api.dbC;
+  var collection = db.collection(collection);
+
+  collection.count(cObject, function(err, res) {
     if(!err) {
       callback(null, res);
     } else {

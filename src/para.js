@@ -7,17 +7,28 @@ const Discord = require("discord.js"),
       elm = require("event-loop-monitor"),
       colors = require("colors"),
       dbApi = require("./database"),
-      mobject = require("mongodb").ObjectID;
+      mobject = require("mongodb").ObjectID,
+      nodeCache = require("node-cache");
       parasphere = new Discord.Client();
 
 log.info('Paragon> Preparing bot...');
+
+//const global.parallax = new NodeCache( { stdTTL: 100, checkperiod: 120 } );
+
+let internalIP = require('dns').lookup(require('os').hostname(), function (err, add, fam) {
+    return add;
+  });
 
 parasphere.on('ready', () => {
   parasphere.started = new Date();
 
   elm.resume();
 
-  dbApi.dbConnect();
+  dbApi.dbConnect(function(db) {
+    var launchsn = {instanceIP: internalIP, currStatus: parasphere.status, guilds: parasphere.guilds.size, readyAt: parasphere.readyAt};
+    dbApi.insert(db, 'instanceLaunches', launchsn);
+    log.info('Manager> Inserted instance launch doc..');
+  });
 
   api.addProxy(proxyInfo.ip, proxyInfo.port);
   log.info('Connected to ' + parasphere.guilds.size + ' guilds');
@@ -68,7 +79,8 @@ parasphere.on('guildMemberRemove', gc => {
 });
 
 parasphere.on('guildUpdate', gc => {
-  var updatesn = {guildID: gc.id, guildName: gc.name, guildRegion: gc.region, owner: gc.owner.id};
+  var updatesn = {$set: {guildID: gc.id, guildName: gc.name, guildRegion: gc.region, owner: gc.owner.id}};
+  log.info(updatesn);
   var idObj = {_id: {guildID: gc.id}};
   dbApi.update(dbApi.dbC, 'guilds', idObj, updatesn);
 });
