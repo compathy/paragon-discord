@@ -1,6 +1,6 @@
 {
   "name": "paragon-discord",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "ParagonBot, but for Discord...",
   "main": "index.js",
   "scripts": {

@@ -3,8 +3,8 @@ const Discord = require("discord.js"),
 
 var manager = {};
 
-manager.commands = ['help', 'info', 'invite', 'proxy', 'mcserver', 'hypixelstats', 'urbandictionary', '8ball'];
-manager.generalCommands = ['help', 'info', 'invite', 'proxy', 'urbandictionary', '8ball'];
+manager.commands = ['help', 'info', 'invite', 'proxy', 'mcserver', 'hypixelstats', 'urbandictionary', '8ball', 'ipinfo'];
+manager.generalCommands = ['help', 'info', 'invite', 'proxy', 'urbandictionary', '8ball', 'ipinfo'];
 manager.minecraftCommands = ['mcserver', 'hypixelstats'];
 
 manager.getHelp = function(callback) {
@@ -20,6 +20,7 @@ const proxyCommand = require("./proxy");
 const urbandictionaryCommand = require("./urbandictionary");
 const utils = require("mc-utils");
 const ballCommand = require("./8ball");
+const ipinfoCommand = require("./ipinfo");
 
 manager.handleCommand = function(cray, user, channel) {
   let cmdToHandle = cray[0].replace(/>/g, '');
@@ -112,6 +113,26 @@ manager.handleCommand = function(cray, user, channel) {
       channel.sendEmbed(embedded);
       });
       break;
+    case 'ipinfo':
+      if(cray.length == 1) {
+        channel.sendMessage(user + " Command> Please specify a domain/IP to lookup!\n EG: `#ipinfo phineas.io`")
+      } else {
+        ipinfoCommand.getInfo(cray[1], function(err, res) {
+          if(!err) {
+            if(res.status == "success") {
+              var embedded = new Discord.RichEmbed().setTitle("**<IP Info - `" + cray[1] + "`>**").setColor("#90B5CA");
+
+              embedded.addField("Organisation", res.org, true).addField("Region Name", res.regionName, true).addField("AS Number", res.as, true);
+              channel.sendEmbed(embedded);
+            } else {
+              channel.sendMessage("IPInfo> Either that IP is out of range or the domain does not exist");
+            }
+          } else {
+            channel.sendMessage("IPInfo> Could not fetch data...");
+          }
+        });
+        break;
+      }
     default:
       channel.sendMessage("Paragon> ?! Command error...")
       break;

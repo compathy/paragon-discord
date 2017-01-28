@@ -17,7 +17,7 @@ log.info('Paragon> Preparing bot...');
 
 let internalIP = require('dns').lookup(require('os').hostname(), function (err, add, fam) {
     return add;
-  });
+});
 
 parasphere.on('ready', () => {
   parasphere.started = new Date();
@@ -39,6 +39,7 @@ parasphere.on('ready', () => {
 let trigger = ">";
 
 parasphere.on('message', msg => {
+  if(parasphere.status != 0) return;
   var messagesn = {messageID: msg.id, userID: msg.author.id, channelID: msg.channel.id, serverID: msg.guild.id, message: msg.content, timestamp: new Date().getTime()};
   dbApi.insert(dbApi.dbC, 'messages', messagesn);
 
@@ -111,12 +112,4 @@ elm.on('data', latency => {
   } else {
     log.info("Latency -> ".magenta + latency.p50);
   }
-});
-
-api.token(function(err, res) {
-    if(err) {
-      log.error('Could not get login token from API'.red);
-      return
-    }
-    parasphere.login(res);
 });
