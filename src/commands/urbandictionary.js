@@ -1,5 +1,5 @@
 const request = require("request"),
-      keys = require("../../data/keys.json");
+  keys = require("../../data/keys.json");
 
 var command = {};
 
@@ -13,9 +13,24 @@ command.dict = function(term, callback) {
     },
     timeout: 3000
   }, function(err, res, body) {
-    if(!err) {
+    if (!err) {
       var dataset = JSON.parse(body);
-      callback(null, dataset.list[0]);
+
+      if (dataset.list[0]) {
+        if (dataset.list[0].definition < 1025) {
+          callback(null, dataset.list[0]);
+        } else if (dataset.list[1]) {
+          callback(null, dataset.list[1]);
+        } else {
+          callback(null, [{
+            "definition": "Too long to display :/",
+            "example": "Too long to display :/",
+            "permalink": "https://urbandictionary.com"
+          }]);
+        }
+      } else {
+        callback(null, dataset.list[0]);
+      }
     } else {
       callback(err, null)
       log.err("Mashape didn't want to repond to a request :/");
