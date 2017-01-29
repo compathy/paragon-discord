@@ -1,15 +1,15 @@
 const Discord = require("discord.js"),
   log = require("fancy-log"),
   api = require("./apiHandler"),
-  proxyInfo = require("../data/proxy.json")
-commander = require("./commands/commander"),
+  proxyInfo = require("../data/proxy.json"),
+  commander = require("./commands/commander"),
   toobusy = require("toobusy-js"),
   elm = require("event-loop-monitor"),
   colors = require("colors"),
   dbApi = require("./database"),
   mobject = require("mongodb").ObjectID,
-  nodeCache = require("node-cache");
-parasphere = new Discord.Client();
+  nodeCache = require("node-cache"),
+  parasphere = new Discord.Client();
 
 log.info('Paragon> Preparing bot...');
 
@@ -68,7 +68,7 @@ parasphere.on('message', msg => {
     msg.channel.sendMessage(msg.author + " Command not found! Use >help for a list of commands.");
     return;
   } else {
-    commander.handleCommand(cmdFormd, msg.author, msg.channel);
+    commander.handleCommand(msg, cmdFormd, msg.author, msg.channel);
   }
 });
 
