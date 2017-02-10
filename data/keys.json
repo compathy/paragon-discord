@@ -1,8 +1,13 @@
 {
   "mashape": "",
   "hypixel": "",
+  "wolfram": "",
   "mongo": {
     "host": "localhost",
     "database": "parasphere"
+  }, "twitter": {
+    "consumerKey": "",
+    "consumerSecret": "",
+    "bearer": ""
   }
 }
