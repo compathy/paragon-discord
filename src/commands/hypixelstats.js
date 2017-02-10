@@ -1,6 +1,6 @@
 const request = require("request"),
-  keys = require("../../data/keys"),
-  log = require("fancy-log");
+      keys = require("../../data/keys"),
+      log = require("fancy-log");
 
 var command = {};
 
@@ -10,14 +10,12 @@ command.getStats = function(username, callback) {
     method: 'GET',
     timeout: 3000
   }, function(err, res, body) {
-    if (!err) {
+    if(!err) {
       var dataset = JSON.parse(body);
-      if (dataset.success) {
+      if(dataset.success) {
         callback(null, dataset);
       } else {
-        callback(null, JSON.parse({
-          success: false
-        }));
+        callback(null, JSON.parse({success: false}));
       }
     } else {
       callback(err, null);
