@@ -1,7 +1,7 @@
 const mongo = require("mongodb"),
   MongoClient = mongo.MongoClient,
   data = require("../data/keys.json"),
-  mobject = require("mongodb").ObjectID,
+  mobject = require("mongodb").ObjectID;
   log = require("fancy-log");
 
 var api = {};
@@ -46,7 +46,7 @@ api.get = function(query, collection, callback) {
   var collection = db.collection(collection);
 
   collection.findOne(query, function(err, res) {
-    if (!err) {
+    if(!err) {
       callback(null, res);
     } else {
       callback(err, null);
@@ -68,7 +68,7 @@ api.count = function(cObject, collection, callback) {
   var collection = db.collection(collection);
 
   collection.count(cObject, function(err, res) {
-    if (!err) {
+    if(!err) {
       callback(null, res);
     } else {
       callback(err, null);
